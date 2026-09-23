@@ -1,0 +1,31 @@
+{
+  "description": "Dynamic weather-based advisory rules. rainfall_probability_percent is 0-100, rainfall_mm is forecast accumulation.",
+  "temperature_rules": [
+    { "condition": "above", "value_celsius": 38, "advice": "High temperature stress expected ({temperature}\u00b0C). Increase irrigation frequency and consider shade nets for sensitive crops." },
+    { "condition": "below", "value_celsius": 10, "advice": "Low temperature alert ({temperature}\u00b0C). Risk of cold stress/frost damage; consider protective covering for young plants." },
+    { "condition": "between", "min_celsius": 20, "max_celsius": 32, "advice": "Temperature is within the favorable range ({temperature}\u00b0C) for normal crop growth." }
+  ],
+  "rainfall_rules": [
+    {
+      "condition": "high_probability",
+      "threshold_percent": 60,
+      "advice": "High chance of rainfall ({rainfall_probability}% probability, {rainfall_mm}mm expected). Delay fertilizer and pesticide application to avoid runoff and wastage.",
+      "actions": ["delay_fertilizer", "delay_pesticide", "delay_irrigation"]
+    },
+    {
+      "condition": "moderate_probability",
+      "threshold_percent": 30,
+      "advice": "Moderate chance of rainfall ({rainfall_probability}% probability). Monitor conditions before applying fertilizer or irrigating.",
+      "actions": ["monitor_before_irrigation"]
+    },
+    {
+      "condition": "low_probability",
+      "threshold_percent": 0,
+      "advice": "Low chance of rainfall. Proceed with planned irrigation and field operations as scheduled.",
+      "actions": ["proceed_as_normal"]
+    }
+  ],
+  "combined_rules": {
+    "heavy_rain_and_high_temp_gap": "Sudden temperature drop after rainfall can stress crops; monitor for fungal disease risk due to high humidity following rain."
+  }
+}

@@ -1,0 +1,23 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+
+logs/*.log
+
+# Trained model artifacts (regenerate via training/ scripts)
+models/*.pkl
+models/*.h5
+models/*.json
+!models/.gitkeep
+
+# Large raw datasets (keep folder structure, not the actual images)
+datasets/crop_images/**/*.jpg
+datasets/crop_images/**/*.jpeg
+datasets/crop_images/**/*.png
+datasets/_stage_pool/
+datasets/_disease_pool/
+
+.pytest_cache/
+.DS_Store

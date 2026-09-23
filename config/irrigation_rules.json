@@ -1,0 +1,42 @@
+{
+  "description": "Dynamic irrigation recommendation rules per crop and growth stage. Soil moisture is expressed as a percentage (0-100).",
+  "default_moisture_thresholds": {
+    "low": 30,
+    "medium": 50,
+    "high": 70
+  },
+  "crop_stage_moisture_requirements": {
+    "rice": {
+      "seedling":   { "min_moisture": 60, "ideal_moisture": 75 },
+      "tillering":  { "min_moisture": 55, "ideal_moisture": 70 },
+      "vegetative": { "min_moisture": 55, "ideal_moisture": 70 },
+      "flowering":  { "min_moisture": 65, "ideal_moisture": 80 },
+      "maturity":   { "min_moisture": 40, "ideal_moisture": 55 }
+    },
+    "wheat": {
+      "seedling":   { "min_moisture": 45, "ideal_moisture": 60 },
+      "tillering":  { "min_moisture": 40, "ideal_moisture": 55 },
+      "vegetative": { "min_moisture": 40, "ideal_moisture": 55 },
+      "flowering":  { "min_moisture": 50, "ideal_moisture": 65 },
+      "maturity":   { "min_moisture": 25, "ideal_moisture": 40 }
+    },
+    "maize": {
+      "seedling":   { "min_moisture": 45, "ideal_moisture": 60 },
+      "tillering":  { "min_moisture": 40, "ideal_moisture": 55 },
+      "vegetative": { "min_moisture": 45, "ideal_moisture": 60 },
+      "flowering":  { "min_moisture": 55, "ideal_moisture": 70 },
+      "maturity":   { "min_moisture": 30, "ideal_moisture": 45 }
+    }
+  },
+  "irrigation_amount_rules": {
+    "method": "deficit_based",
+    "mm_per_percent_deficit": 1.5,
+    "min_recommended_mm": 5,
+    "max_recommended_mm": 60
+  },
+  "messages": {
+    "irrigation_required": "Soil moisture for {crop} at {stage} stage is {moisture}%, below the minimum required {min_moisture}%. Irrigation is recommended: approximately {amount_mm} mm of water.",
+    "irrigation_optional": "Soil moisture for {crop} at {stage} stage is {moisture}%, slightly below ideal ({ideal_moisture}%). Light irrigation of {amount_mm} mm is optional.",
+    "no_irrigation_needed": "Soil moisture for {crop} at {stage} stage is {moisture}%, which is sufficient. No irrigation needed at this time."
+  }
+}

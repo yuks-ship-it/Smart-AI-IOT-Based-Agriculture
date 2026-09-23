@@ -1,0 +1,200 @@
+{
+  "description": "Pest identification and management rules. Pest class names must match training image folder names exactly. Each entry covers identification, economic threshold (when to spray), chemical control, organic control, and prevention. Extend this file when adding new pest classes to the detection model.",
+
+  "pests": {
+
+    "rice_yellow_stem_borer": {
+      "crop": "rice",
+      "display_name": "Yellow Stem Borer",
+      "scientific_name": "Scirpophaga incertulas",
+      "default_severity": "high",
+      "type": "insect",
+      "damage_symptoms": {
+        "vegetative_stage": "Dead Heart — central shoot of the tiller turns yellow and dries up. Can be easily pulled out.",
+        "reproductive_stage": "White Ear — panicle turns white and empty at heading stage. Grain is not formed."
+      },
+      "identification": "Adult moth is pale yellow-white. Caterpillar (larva) is whitish-yellow, bores into stem and feeds inside. Egg masses are white and fluffy on leaves.",
+      "economic_threshold": "5% Dead Heart at vegetative stage OR 1% White Ear at reproductive stage — spray when damage reaches this level.",
+      "favorable_conditions": "High humidity, dense planting, continuous rice cultivation, excess nitrogen fertilizer.",
+      "management": {
+        "chemical": {
+          "vegetative_stage": "Spray Chlorpyrifos (2ml/L) or Cartap Hydrochloride (1g/L) or Fipronil (1ml/L) targeting the leaf sheath and stem base. Apply in evening hours.",
+          "reproductive_stage": "Spray Chlorantraniliprole (Coragen) 0.4ml/L or Flubendiamide 0.5ml/L at boot leaf stage before heading. This is the most critical timing."
+        },
+        "granules": "Apply Carbofuran 3G (33 kg/ha) or Fipronil 0.3G granules in the standing water at tillering stage for systemic protection.",
+        "organic": "Release egg parasitoid Trichogramma japonicum (1,50,000/ha) at egg stage. Set up light traps to catch adult moths. Use pheromone traps (5/ha) to monitor and mass-trap males.",
+        "cultural": "Clip shoot tips before transplanting to remove egg masses. Remove and destroy stubbles after harvest. Flood and plow field to kill pupae."
+      },
+      "stage_specific_advice": {
+        "seedling": "Monitor nursery for egg masses. Clip leaf tips before transplanting.",
+        "tillering": "Critical monitoring stage. Count dead hearts. Release Trichogramma.",
+        "vegetative": "Apply granules if threshold reached. Monitor weekly.",
+        "flowering": "Spray Coragen at boot leaf stage — most important application.",
+        "maturity": "No spray needed. Harvest promptly to avoid further damage."
+      },
+      "prevention": "Avoid excess nitrogen, especially at tillering. Maintain water level at 5cm. Use resistant varieties (Ratna, Vikas). Synchronize planting in an area to break pest cycle. Remove ratoon rice."
+    },
+
+    "rice_leaf_roller": {
+      "crop": "rice",
+      "display_name": "Rice Leaf Roller",
+      "scientific_name": "Cnaphalocrocis medinalis",
+      "default_severity": "moderate",
+      "type": "insect",
+      "damage_symptoms": {
+        "all_stages": "Larva rolls leaf longitudinally and feeds on green tissue from inside the rolled leaf. Affected leaves show white papery streaks (scraped green tissue). Severe attack gives field a burnt appearance."
+      },
+      "identification": "Adult moth is small, yellow-brown with dark wavy lines. Larva is pale green, feeds inside rolled leaf tube. Leaf rolls are characteristic — cylindrical tubes tied with silk.",
+      "economic_threshold": "1 leaf roller per hill at tillering to booting stage. 25% leaf damage visible in field.",
+      "favorable_conditions": "High humidity, shaded conditions, dense planting, high nitrogen, temperatures 25-30 degrees C.",
+      "management": {
+        "chemical": "Spray Chlorpyrifos (2ml/L) or Lambda-cyhalothrin (0.5ml/L) or Cartap Hydrochloride (1g/L). Apply in morning when larvae are active. Ensure spray reaches inside rolled leaves.",
+        "organic": "Release Trichogramma chilonis (1,50,000/ha) as egg parasitoid. Spray Bacillus thuringiensis (Bt) 1g/L — effective against young larvae. Use light traps.",
+        "cultural": "Avoid excess nitrogen. Cut and destroy rolled leaves to kill larvae inside. Maintain field sanitation."
+      },
+      "stage_specific_advice": {
+        "seedling": "Usually not a problem at this stage.",
+        "tillering": "Monitor closely. Economic threshold is 1 larva per hill.",
+        "vegetative": "Most damaging stage. Apply spray if threshold reached.",
+        "flowering": "Damage at this stage reduces grain filling. Apply immediately.",
+        "maturity": "Damage at this stage has minimal yield impact. Spray not recommended."
+      },
+      "prevention": "Avoid dense planting. Reduce nitrogen at tillering. Drain field periodically to reduce humidity. Remove grassy weeds from bunds which serve as alternate host."
+    },
+
+    "rice_hispa": {
+      "crop": "rice",
+      "display_name": "Rice Hispa",
+      "scientific_name": "Dicladispa armigera",
+      "default_severity": "moderate",
+      "type": "insect",
+      "damage_symptoms": {
+        "adult": "Adults scrape green tissue from upper leaf surface causing white parallel streaks along the leaf. Leaves turn whitish and dry.",
+        "larva": "Larvae mine inside the leaf tissue creating irregular whitish blotches (mines). Leaf tip dies and folds."
+      },
+      "identification": "Adult is a small, spiny, dark blue-black beetle about 4-5mm long. Larvae are whitish-yellow and flat, found mining inside leaves. Damage shows as white streaks and irregular mines.",
+      "economic_threshold": "1 adult beetle per hill OR 2 mines per leaf in early stages. 10-25% leaves with mining damage.",
+      "favorable_conditions": "Cloudy weather, high humidity, shaded field conditions, dense planting, early season crop.",
+      "management": {
+        "chemical": "Spray Malathion (2ml/L) or Quinalphos (2ml/L) or Chlorpyrifos (2ml/L). Spray in morning when adults are active on leaves. Two applications at 10-day interval.",
+        "organic": "Clip and destroy mined leaves to reduce larval population. Spray Neem oil (5ml/L) to repel adults. Use light traps for adults.",
+        "cultural": "Remove and burn clipped leaves immediately. Avoid shading conditions."
+      },
+      "stage_specific_advice": {
+        "seedling": "High risk at nursery stage. Monitor daily.",
+        "tillering": "Most vulnerable stage. Count adults per hill.",
+        "vegetative": "Apply spray if threshold reached.",
+        "flowering": "Damage less critical but monitor.",
+        "maturity": "No action needed."
+      },
+      "prevention": "Early planting avoids peak hispa period. Avoid dense nursery. Remove weeds. Reduce excessive shading. Monitor regularly from seedling stage."
+    },
+
+    "rice_ear_eating_caterpillar": {
+      "crop": "rice",
+      "display_name": "Rice Ear Eating Caterpillar",
+      "scientific_name": "Mythimna separata / Helicoverpa armigera",
+      "default_severity": "high",
+      "type": "insect",
+      "damage_symptoms": {
+        "reproductive_stage": "Caterpillar feeds directly on developing grains inside the panicle. Grains at milk and dough stage are eaten. Panicle shows chewed, broken florets. Frass (excreta) visible on panicle. High yield loss if not controlled."
+      },
+      "identification": "Caterpillar is greenish-brown with dark stripes along the body, about 3-4cm long. Found inside or between florets of the panicle. Adult moth is pale brown. Damage is direct grain loss.",
+      "economic_threshold": "1 caterpillar per 5 panicles OR 5% panicles damaged. Act immediately at first sighting at heading stage.",
+      "favorable_conditions": "Dry spells after humid weather, late-planted crop, field near light sources, temperatures 25-35 degrees C.",
+      "management": {
+        "chemical": "Spray Quinalphos (2ml/L) or Chlorpyrifos (2ml/L) or Cypermethrin (0.5ml/L) directly targeting the panicles. Apply in evening when caterpillars are most active. Repeat after 7-10 days.",
+        "organic": "Spray Bacillus thuringiensis (Bt) 2g/L targeting panicles. Set up light traps to catch adult moths before egg laying. Pheromone traps for Helicoverpa (5/ha).",
+        "cultural": "Set up light traps from heading stage. Collect and destroy caterpillars manually if infestation is localized. Bird perches (T-shaped sticks at 25/ha) attract predatory birds."
+      },
+      "stage_specific_advice": {
+        "seedling": "Not affected at this stage.",
+        "tillering": "Not affected.",
+        "vegetative": "Monitor for early moth activity near field.",
+        "flowering": "Highest risk period. Monitor panicles daily at heading.",
+        "maturity": "Act immediately if caterpillars found at milk-dough stage — this is when yield loss is maximum."
+      },
+      "prevention": "Light traps from heading stage. Avoid late planting. Bird perches in field. Maintain field sanitation. Avoid planting near maize fields (alternate host for Helicoverpa)."
+    },
+
+    "rice_brown_planthopper": {
+      "crop": "rice",
+      "display_name": "Brown Plant Hopper",
+      "scientific_name": "Nilaparvata lugens",
+      "default_severity": "high",
+      "type": "insect",
+      "damage_symptoms": {
+        "direct": "Both adults and nymphs suck sap from leaf sheath at plant base. Plants turn yellow, then orange-brown, then dry completely. Characteristic circular patches of dead plants in field called Hopperburn.",
+        "indirect": "Transmits Grassy Stunt and Ragged Stunt viral diseases of rice."
+      },
+      "identification": "Adult is small (4-5mm), brown insect found at base of plant near water surface. Two forms — macropterous (winged, migrates) and brachypterous (short-winged, stays in field). Nymphs are whitish. Check at plant base by pushing apart stems.",
+      "economic_threshold": "10 hoppers per hill at tillering-booting stage. 5 hoppers per hill at heading. Spray immediately — BPH populations can double in 3-4 days.",
+      "favorable_conditions": "High humidity, dense planting, high nitrogen, continuous flooding, temperatures 20-30 degrees C. Misuse of broad-spectrum insecticides which kill natural enemies causes BPH outbreaks (resurgence).",
+      "management": {
+        "chemical": "Spray Buprofezin (1ml/L) or Thiamethoxam (0.2g/L) or Imidacloprid (0.5ml/L) or Pymetrozine (0.6g/L) targeting the plant base. Direct spray to base of plant, not top. NEVER spray synthetic pyrethroids — they kill natural enemies and cause BPH resurgence.",
+        "organic": "Drain field for 3-4 days to expose hoppers at base. Release spiders and other natural enemies by avoiding broad-spectrum pesticides. Spray Beauveria bassiana (5g/L) fungal bioagent.",
+        "cultural": "Drain field periodically — even 3 days of drainage reduces BPH population significantly. Reduce nitrogen doses. Widen planting spacing."
+      },
+      "stage_specific_advice": {
+        "seedling": "Monitor at base of seedlings in nursery.",
+        "tillering": "Monitor at stem base weekly. Most critical monitoring period.",
+        "vegetative": "Count per hill. Drain field if population is rising.",
+        "flowering": "Spray immediately if threshold reached — hopperburn at this stage causes total yield loss.",
+        "maturity": "Spray only if hopperburn is spreading actively."
+      },
+      "prevention": "Avoid dense planting. Do not over-apply nitrogen. Do not use synthetic pyrethroids (Cypermethrin, Deltamethrin) as main BPH spray. Use resistant varieties (IR36, IR64, Swarna). Periodic field drainage. Conserve spiders and natural enemies."
+    },
+
+    "rice_green_planthopper": {
+      "crop": "rice",
+      "display_name": "Green Plant Hopper",
+      "scientific_name": "Nephotettix virescens / Nephotettix nigropictus",
+      "default_severity": "moderate",
+      "type": "insect",
+      "damage_symptoms": {
+        "direct": "Sucks sap from leaves and leaf sheath. Causes yellowing and stunting.",
+        "indirect": "PRIMARY VECTOR of Tungro virus disease of rice — the most damaging rice virus disease. A single viruliferous leafhopper can infect multiple plants."
+      },
+      "identification": "Adult is small (5-6mm), bright green leafhopper with black spots on wings. Found on upper parts of plant unlike BPH which is at base. Nymphs are pale green.",
+      "economic_threshold": "2-3 hoppers per hill in areas where Tungro is present. In Tungro-free areas, 10-15 per hill. Control is more important for virus prevention than direct damage.",
+      "favorable_conditions": "Presence of Tungro-infected plants as virus source. High leafhopper population. Early season crop. Temperatures 25-35 degrees C.",
+      "management": {
+        "chemical": "Spray Imidacloprid (0.5ml/L) or Thiamethoxam (0.2g/L) or Buprofezin (1ml/L). Seed treatment with Imidacloprid 600FS is highly effective for early season protection against vector hoppers.",
+        "organic": "Yellow sticky traps to catch adults. Neem oil spray (5ml/L) as repellent. Light traps to monitor population.",
+        "cultural": "Remove Tungro-infected plants immediately and destroy. Avoid planting near fields with Tungro infection."
+      },
+      "stage_specific_advice": {
+        "seedling": "Seed treatment with Imidacloprid is most critical intervention — protects against vector transmission in early stage.",
+        "tillering": "Monitor and spray if threshold is reached.",
+        "vegetative": "Remove any plants showing Tungro symptoms (yellowing, stunting, orange discoloration).",
+        "flowering": "Monitor and spray if threshold reached.",
+        "maturity": "Control less critical at this stage."
+      },
+      "prevention": "Seed treatment with Imidacloprid. Use Tungro-resistant varieties. Remove and burn Tungro-infected plants immediately. Synchronize planting to avoid continuous host availability. Monitor regularly."
+    }
+  },
+
+  "stage_spray_restrictions": {
+    "description": "Some pesticides are restricted at certain growth stages due to pollinator safety, residue concerns, or crop damage risk. Always check this before recommending spray.",
+    "restrictions": [
+      {
+        "stage": "flowering",
+        "restriction": "Avoid spraying any insecticide during active flowering hours (6am-10am) to protect pollinators. Spray in evening only.",
+        "applies_to": "all insecticides"
+      },
+      {
+        "stage": "maturity",
+        "restriction": "Observe pre-harvest interval (PHI) — do not spray within 14 days of expected harvest for most insecticides. Check label.",
+        "applies_to": "all chemical pesticides"
+      }
+    ]
+  },
+
+  "general_guidelines": {
+    "spray_timing": "Spray in early morning or evening. Avoid midday spraying due to heat, evaporation, and pollinator activity.",
+    "water_volume": "Use 500 liters of water per hectare for good coverage. Ensure thorough coverage of plant base for hoppers.",
+    "safety": "Always wear protective clothing, gloves, and mask when handling and spraying pesticides.",
+    "resistance_management": "Rotate chemical groups (modes of action) to prevent pesticide resistance. Do not use the same chemical more than twice per season.",
+    "pre_harvest_interval": "Stop all chemical sprays at least 14 days before harvest unless the product label specifies otherwise."
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "description": "Rice disease treatment knowledge base. Class names must match training image folder names exactly.",
+
+  "diseases": {
+
+    "bacterial_leaf_blight": {
+      "crop": "rice",
+      "display_name": "Bacterial Leaf Blight",
+      "also_known_as": "Kresek / BLB",
+      "causal_agent": "Xanthomonas oryzae pv. oryzae (bacteria)",
+      "default_severity": "high",
+      "symptoms": "Water-soaked to yellowish stripe on leaf margins, later turning white to gray. Leaves wilt and roll. In severe cases entire plant wilts (kresek stage).",
+      "favorable_conditions": "High humidity, heavy rainfall, high nitrogen, temperatures 25-34 degrees C, strong winds.",
+      "treatment": {
+        "chemical": "Spray Copper Oxychloride (3g/L) or Streptocycline (0.5g/L) + Copper Sulphate (2.5g/L). Repeat after 10-14 days if needed.",
+        "organic": "Apply Pseudomonas fluorescens bioagent (10g/L) as foliar spray. Avoid excess nitrogen top-dressing.",
+        "systemic": "Drain the field and stop nitrogen fertilizer application immediately when infection is detected."
+      },
+      "prevention": "Use resistant varieties (IR64, Swarna Sub-1). Treat seeds with Streptocycline before sowing. Avoid high nitrogen doses. Ensure proper field drainage. Remove and burn infected stubbles."
+    },
+
+    "brown_spot": {
+      "crop": "rice",
+      "display_name": "Brown Leaf Spot",
+      "also_known_as": "Helminthosporium Leaf Spot",
+      "causal_agent": "Bipolaris oryzae (fungus)",
+      "default_severity": "moderate",
+      "symptoms": "Circular to oval brown spots with yellow halo on leaves. Spots have dark brown border. Grains also infected causing grain discoloration and reduced quality.",
+      "favorable_conditions": "Nutrient-deficient soils especially low potassium and silicon, drought stress, temperatures 25-30 degrees C, high humidity.",
+      "treatment": {
+        "chemical": "Spray Mancozeb (2.5g/L) or Propiconazole (1ml/L) or Iprodione (2ml/L). Apply 2 sprays at 10-day interval.",
+        "organic": "Improve soil fertility first. Apply potassium fertilizer. Spray Pseudomonas fluorescens.",
+        "systemic": "Correct soil nutrient deficiencies. This disease is strongly linked to poor soil nutrition especially potassium deficiency."
+      },
+      "prevention": "Use well-fertilized soil with balanced NPK. Potassium top-dressing reduces severity significantly. Use certified seeds. Seed treatment with Mancozeb (3g/kg)."
+    },
+
+    "leaf_blast": {
+      "crop": "rice",
+      "display_name": "Leaf Blast",
+      "also_known_as": "Rice Blast (Leaf Phase)",
+      "causal_agent": "Magnaporthe oryzae (fungus)",
+      "default_severity": "high",
+      "symptoms": "Diamond-shaped lesions with gray center and brown border on leaves. Lesions have yellow halo. Severe infection causes entire leaves to dry up.",
+      "favorable_conditions": "Cool nights below 20 degrees C, high humidity, heavy dew, temperatures 20-28 degrees C, excess nitrogen.",
+      "treatment": {
+        "chemical": "Spray Tricyclazole (0.6g/L) or Isoprothiolane (1.5ml/L) or Azoxystrobin (1ml/L). Apply immediately at first sign. Repeat after 10 days.",
+        "organic": "Spray Pseudomonas fluorescens (10g/L). Silicon-based foliar spray strengthens cell walls.",
+        "systemic": "Reduce nitrogen top-dressing. Avoid excess irrigation."
+      },
+      "prevention": "Use blast-resistant varieties. Seed treatment with Tricyclazole (2g/kg seed). Balanced nitrogen application. Avoid dense planting. Monitor field regularly from tillering stage."
+    },
+
+    "panicle_blast": {
+      "crop": "rice",
+      "display_name": "Neck Blast",
+      "also_known_as": "Panicle Blast / Rotten Neck",
+      "causal_agent": "Magnaporthe oryzae (fungus)",
+      "default_severity": "high",
+      "symptoms": "Brown to black lesion at the base of panicle neck node. Infected panicles turn white and remain unfilled with empty grains. Entire panicle may break and fall.",
+      "favorable_conditions": "Same as leaf blast. Most damaging at flowering and grain filling stage.",
+      "treatment": {
+        "chemical": "Spray Tricyclazole (0.6g/L) or Propiconazole (1ml/L) at boot stage before heading and again at 50% heading. This is the critical application window.",
+        "organic": "Spray Pseudomonas fluorescens at boot leaf stage. Silicon supplementation reduces severity.",
+        "systemic": "Cannot undo damage once neck is infected. Preventive spray is essential."
+      },
+      "prevention": "Preventive fungicide spray at boot stage is the single most important control measure. Use resistant varieties. Balanced fertilization. Do not apply heavy nitrogen at heading stage."
+    },
+
+    "narrow_brown_spot": {
+      "crop": "rice",
+      "display_name": "Narrow Brown Spot",
+      "also_known_as": "Cercospora Leaf Spot",
+      "causal_agent": "Cercospora janseana (fungus)",
+      "default_severity": "moderate",
+      "symptoms": "Narrow, linear brown spots running parallel to leaf veins. Spots are dark brown with no distinct halo unlike regular brown spot. Lesions are narrow and elongated giving a streaked appearance.",
+      "favorable_conditions": "High humidity, temperatures 25-30 degrees C, dense planting, nutrient deficient soils.",
+      "treatment": {
+        "chemical": "Spray Mancozeb (2.5g/L) or Carbendazim (1g/L) or Propiconazole (1ml/L). Apply 2 sprays at 10-day interval when symptoms first appear.",
+        "organic": "Improve soil potassium levels. Spray Pseudomonas fluorescens (10g/L). Remove and destroy infected leaves.",
+        "systemic": "Correct soil nutrient deficiency. Improve field drainage and reduce humidity through proper plant spacing."
+      },
+      "prevention": "Balanced NPK fertilization especially adequate potassium. Avoid dense planting. Use certified disease-free seeds. Seed treatment with Mancozeb (3g/kg). Crop rotation."
+    },
+
+    "healthy": {
+      "crop": "rice",
+      "display_name": "Healthy",
+      "causal_agent": "None",
+      "default_severity": "none",
+      "symptoms": "No visible disease symptoms. Leaves are green and healthy.",
+      "favorable_conditions": "N/A",
+      "treatment": {
+        "chemical": "No treatment required.",
+        "organic": "Continue regular monitoring.",
+        "systemic": "Maintain current crop management practices."
+      },
+      "prevention": "Continue current practices. Monitor weekly for early signs of disease."
+    }
+
+  }
+}

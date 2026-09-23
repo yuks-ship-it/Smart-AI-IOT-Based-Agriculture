@@ -1,0 +1,49 @@
+{
+  "models": {
+    "crop_recommendation": {
+      "algorithm": "random_forest",
+      "path": "models/crop_recommendation.pkl",
+      "label_encoder_path": "models/crop_label_encoder.pkl",
+      "scaler_path": "models/crop_scaler.pkl"
+    },
+    "stage_classification": {
+      "path": "models/stage_model.keras",
+      "labels_path": "models/stage_labels.json",
+      "image_size": [224, 224],
+      "backbone": "MobileNetV2"
+    },
+    "disease_detection": {
+      "default_crop": "rice",
+      "image_size": [224, 224],
+      "backbone": "EfficientNetB0",
+      "per_crop": {
+        "rice": {
+          "path": "models/disease_model_rice.keras",
+          "labels_path": "models/disease_labels_rice.json"
+        },
+        "wheat": {
+          "path": "models/disease_model_wheat.keras",
+          "labels_path": "models/disease_labels_wheat.json"
+        }
+      }
+    }
+  },
+  "supported_crops": ["rice", "wheat", "maize"],
+  "growth_stages": ["tillering", "vegetative", "flowering", "maturity"],
+  "disease_severity_levels": ["low", "moderate", "high"],
+  "confidence_threshold": 0.5,
+  "sensor_fallbacks": {
+    "humidity": {
+      "source": "weather_api",
+      "description": "If the IoT device has no humidity sensor, humidity is auto-fetched from a weather API using device latitude/longitude. If no location is available or the fetch fails, fallback_percent is used.",
+      "weather_api_base_url": "https://api.open-meteo.com/v1/forecast",
+      "cache_ttl_seconds": 600,
+      "fallback_percent": 65.0
+    },
+    "ph": {
+      "source": "default",
+      "description": "If the IoT device has no pH sensor, this neutral default is used. Override per-request by sending an actual ph reading when available.",
+      "fallback_value": 6.5
+    }
+  }
+}

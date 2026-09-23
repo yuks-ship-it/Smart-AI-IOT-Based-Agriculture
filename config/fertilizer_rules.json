@@ -1,0 +1,55 @@
+{
+  "description": "Dynamic fertilizer recommendation rules. Thresholds are in kg/ha (or sensor-equivalent units). Edit this file to change behavior without touching code.",
+  "optimal_npk": {
+    "rice":  { "N": 100, "P": 50, "K": 50 },
+    "wheat": { "N": 120, "P": 60, "K": 40 },
+    "maize": { "N": 150, "P": 75, "K": 60 },
+    "default": { "N": 100, "P": 50, "K": 50 }
+  },
+  "deficiency_thresholds": {
+    "severe_percent": 40,
+    "moderate_percent": 20,
+    "mild_percent": 10
+  },
+  "nutrient_sources": {
+    "N": {
+      "chemical": "Urea",
+      "chemical_nutrient_content_percent": 46,
+      "organic_alternative": "Vermicompost / Farmyard Manure (FYM)"
+    },
+    "P": {
+      "chemical": "DAP (Di-Ammonium Phosphate)",
+      "chemical_nutrient_content_percent": 46,
+      "organic_alternative": "Rock Phosphate / Bone Meal"
+    },
+    "K": {
+      "chemical": "MOP (Muriate of Potash)",
+      "chemical_nutrient_content_percent": 60,
+      "organic_alternative": "Wood Ash / Banana Peel Compost"
+    }
+  },
+  "messages": {
+    "no_deficiency": "Soil nutrient levels are adequate for {crop}. No additional fertilizer required at this stage.",
+    "deficiency": "{crop} field shows a {severity} deficiency of {nutrient} ({current} vs recommended {optimal}). Apply approximately {quantity_kg_per_ha} kg/ha of {source} ({basis}).",
+    "excess": "{nutrient} level for {crop} is higher than recommended ({current} vs {optimal}). Avoid further {nutrient}-based fertilizer application to prevent nutrient burn or runoff."
+  },
+  "quantity_calculation": {
+    "method": "deficit_to_fertilizer_weight",
+    "note": "quantity_kg_per_ha = (deficit_in_nutrient_kg_per_ha / chemical_nutrient_content_percent) * 100",
+    "safety_cap_kg_per_ha": 250
+  },
+  "ph_rules": {
+    "description": "Soil pH affects how available N/P/K already are to the plant, independent of the raw NPK levels. acidic_below and alkaline_above are on the standard 0-14 pH scale.",
+    "optimal_ph_range": {
+      "rice":  { "min": 5.5, "max": 6.5 },
+      "wheat": { "min": 6.0, "max": 7.5 },
+      "maize": { "min": 5.8, "max": 7.0 },
+      "default": { "min": 6.0, "max": 7.0 }
+    },
+    "messages": {
+      "too_acidic": "Soil pH for {crop} is {ph}, which is acidic (below optimal range {min}-{max}). Nutrient uptake may be reduced even with adequate NPK levels. Consider applying agricultural lime to raise pH.",
+      "too_alkaline": "Soil pH for {crop} is {ph}, which is alkaline (above optimal range {min}-{max}). Consider applying elemental sulfur or organic matter to lower pH and improve nutrient availability.",
+      "optimal": "Soil pH for {crop} is {ph}, within the optimal range ({min}-{max})."
+    }
+  }
+}
