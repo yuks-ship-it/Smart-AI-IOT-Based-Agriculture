@@ -1,0 +1,1556 @@
+################################################################################
+##
+##  DISEASE DETECTION MODEL — DETAILED EPOCH REPORT
+##
+##  Architecture: EfficientNetB0 + Custom Head
+##  Total Parameters: ~4,385,257 (Backbone: 4,049,571 + Head: 335,686)
+##  Input: 224x224x3 RGB images
+##  Output: 6 classes (rice diseases)
+##  Total Epochs: 24 (Phase 1: 8, Phase 2: 16)
+##
+##  Phase 1: Base frozen, train head only (LR=1e-3)
+##  Phase 2: Top 20 layers unfrozen (LR=5e-5, label smoothing, class weights)
+##
+
+##  EPOCH  1  
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0010000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+ 
+  ARCHITECTURE STATE AT EPOCH 1
+ 
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.7101  (71.01%)
+  Validation Accuracy:  0.7306  (73.06%)
+  Training Loss:        0.8769
+  Validation Loss:      1.0575
+  Learning Rate:        0.0010000000
+  Overfit Gap:          -0.0206  (-2.06%)  ✓ OK
+
+
+##  EPOCH  2  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0010000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 2
+
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.7931  (79.31%)
+  Validation Accuracy:  0.7633  (76.33%)
+  Training Loss:        0.5917
+  Validation Loss:      1.1003
+  Learning Rate:        0.0010000000
+  Overfit Gap:          0.0298  (2.98%)  ✓ OK
+
+  CHANGE FROM EPOCH 1:
+  Train Acc:  +0.0830  ↑
+  Val Acc:    +0.0327  ↑
+  Train Loss: -0.2853  ↓ (better)
+  Val Loss:   +0.0428  ↑ (worse)
+
+
+##  EPOCH  3  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0010000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 3
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8077  (80.77%)
+  Validation Accuracy:  0.7719  (77.19%)
+  Training Loss:        0.5180
+  Validation Loss:      1.2010
+  Learning Rate:        0.0010000000
+  Overfit Gap:          0.0358  (3.58%)  ✓ OK
+
+  CHANGE FROM EPOCH 2:
+  Train Acc:  +0.0146  ↑
+  Val Acc:    +0.0086  ↑
+  Train Loss: -0.0737  ↓ (better)
+  Val Loss:   +0.1007  ↑ (worse)
+
+
+##  EPOCH  4  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0010000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 4
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8328  (83.28%)
+  Validation Accuracy:  0.7814  (78.14%)
+  Training Loss:        0.4622
+  Validation Loss:      1.2636
+  Learning Rate:        0.0010000000
+  Overfit Gap:          0.0514  (5.14%)  ✓ OK
+
+  CHANGE FROM EPOCH 3:
+  Train Acc:  +0.0251  ↑
+  Val Acc:    +0.0095  ↑
+  Train Loss: -0.0557  ↓ (better)
+  Val Loss:   +0.0627  ↑ (worse)
+
+
+##  EPOCH  5  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0005000000  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 5
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8466  (84.66%)
+  Validation Accuracy:  0.7952  (79.52%)
+  Training Loss:        0.4104
+  Validation Loss:      1.1250
+  Learning Rate:        0.0005000000
+  Overfit Gap:          0.0514  (5.14%)  ✓ OK
+
+  CHANGE FROM EPOCH 4:
+  Train Acc:  +0.0137  ↑
+  Val Acc:    +0.0138  ↑
+  Train Loss: -0.0518  ↓ (better)
+  Val Loss:   -0.1386  ↓ (better)
+
+
+##  EPOCH  6  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0005000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 6
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8547  (85.47%)
+  Validation Accuracy:  0.7883  (78.83%)
+  Training Loss:        0.3881
+  Validation Loss:      1.1593
+  Learning Rate:        0.0005000000
+  Overfit Gap:          0.0664  (6.64%)  ✓ OK
+
+  CHANGE FROM EPOCH 5:
+  Train Acc:  +0.0082  ↑
+  Val Acc:    -0.0069  ↓
+  Train Loss: -0.0223  ↓ (better)
+  Val Loss:   +0.0343  ↑ (worse)
+
+  ──────────────────────────────────────────────────────────────────────
+  GRADIENT FLOW (sampled from validation batches)
+  ──────────────────────────────────────────────────────────────────────
+  Mean Gradient Norm:  1.51087388
+  Max Gradient Norm:   3.43754625
+  Min Gradient Norm:   0.28545383
+  Healthy Layers:      4
+  Vanishing Layers:    0
+  Exploding Layers:    0
+
+  Layer-wise Gradients:
+    kernel                 3.437546  ██████████████████████████████████  [OK]
+    beta                   1.346304  █████████████  [OK]
+    bias                   0.974192  █████████  [OK]
+    gamma                  0.285454  ██  [OK]
+
+
+##  EPOCH  7  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0005000000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 7
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8532  (85.32%)
+  Validation Accuracy:  0.7823  (78.23%)
+  Training Loss:        0.3970
+  Validation Loss:      1.1068
+  Learning Rate:        0.0005000000
+  Overfit Gap:          0.0709  (7.09%)  ✓ OK
+
+  CHANGE FROM EPOCH 6:
+  Train Acc:  -0.0015  ↓
+  Val Acc:    -0.0060  ↓
+  Train Loss: +0.0089  ↑ (worse)
+  Val Loss:   -0.0525  ↓ (better)
+
+  ──────────────────────────────────────────────────────────────────────
+  GRADIENT FLOW (sampled from validation batches)
+  ──────────────────────────────────────────────────────────────────────
+  Mean Gradient Norm:  1.51421485
+  Max Gradient Norm:   3.42844796
+  Min Gradient Norm:   0.30406871
+  Healthy Layers:      4
+  Vanishing Layers:    0
+  Exploding Layers:    0
+
+  Layer-wise Gradients:
+    kernel                 3.428448  ██████████████████████████████████  [OK]
+    beta                   1.350871  █████████████  [OK]
+    bias                   0.973471  █████████  [OK]
+    gamma                  0.304069  ███  [OK]
+
+
+##  EPOCH  8  
+
+
+  PHASE: Phase 1 — Feature Extraction (Base Frozen)
+  Strategy: Only train the custom head. Pretrained EfficientNet features are used as-is.
+  Optimizer: Adam | LR: 0.0002500000  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes (compensates panicle_blast underrepresentation)
+  Trainable Params: ~335,686
+  Frozen Params: ~4,049,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 8
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [ FROZEN ] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [ FROZEN ] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [ FROZEN ] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8635  (86.35%)
+  Validation Accuracy:  0.7943  (79.43%)
+  Training Loss:        0.3666
+  Validation Loss:      1.1578
+  Learning Rate:        0.0002500000
+  Overfit Gap:          0.0692  (6.92%)  ✓ OK
+
+  CHANGE FROM EPOCH 7:
+  Train Acc:  +0.0103  ↑
+  Val Acc:    +0.0120  ↑
+  Train Loss: -0.0304  ↓ (better)
+  Val Loss:   +0.0510  ↑ (worse)
+
+  ──────────────────────────────────────────────────────────────────────
+  GRADIENT FLOW (sampled from validation batches)
+  ──────────────────────────────────────────────────────────────────────
+  Mean Gradient Norm:  1.56654617
+  Max Gradient Norm:   3.75408840
+  Min Gradient Norm:   0.33351684
+  Healthy Layers:      4
+  Vanishing Layers:    0
+  Exploding Layers:    0
+
+  Layer-wise Gradients:
+    kernel                 3.754088  █████████████████████████████████████  [OK]
+    beta                   1.272797  ████████████  [OK]
+    bias                   0.905783  █████████  [OK]
+    gamma                  0.333517  ███  [OK]
+
+
+##  EPOCH  9  |  *** PHASE TRANSITION ***
+
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000500000  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 9
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.7861  (78.61%)
+  Validation Accuracy:  0.7745  (77.45%)
+  Training Loss:        1.0309
+  Validation Loss:      1.6376
+  Learning Rate:        0.0000500000
+  Overfit Gap:          0.0115  (1.15%)  ✓ OK
+
+  CHANGE FROM EPOCH 8:
+  Train Acc:  -0.0775  ↓
+  Val Acc:    -0.0198  ↓
+  Train Loss: +0.6643  ↑ (worse)
+  Val Loss:   +0.4798  ↑ (worse)
+
+  **********************************************************************
+  *** PHASE TRANSITION: Phase 1 → Phase 2 ***
+  **********************************************************************
+  WHAT CHANGED:
+    - Top 20 layers of EfficientNet UNFROZEN (were frozen)
+    - Blocks now trainable: block6 (partial), block7, top
+    - Learning rate RESET to 5e-5 (was 0.00025000)
+    - Trainable params: ~335K → ~995K (3x increase)
+    - Model now adapts pretrained features to disease patterns
+  **********************************************************************
+
+
+##  EPOCH 10  
+
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000500000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  
+  ARCHITECTURE STATE AT EPOCH 10
+  
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8129  (81.29%)
+  Validation Accuracy:  0.7745  (77.45%)
+  Training Loss:        0.9267
+  Validation Loss:      1.6006
+  Learning Rate:        0.0000500000
+  Overfit Gap:          0.0383  (3.83%)  ✓ OK
+
+  CHANGE FROM EPOCH 9:
+  Train Acc:  +0.0268  ↑
+  Val Acc:    +0.0000  ↓
+  Train Loss: -0.1042  ↓ (better)
+  Val Loss:   -0.0370  ↓ (better)
+
+
+##  EPOCH 11  
+
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000500000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 11
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8305  (83.05%)
+  Validation Accuracy:  0.7986  (79.86%)
+  Training Loss:        0.8877
+  Validation Loss:      1.5130
+  Learning Rate:        0.0000500000
+  Overfit Gap:          0.0318  (3.18%)  ✓ OK
+
+  CHANGE FROM EPOCH 10:
+  Train Acc:  +0.0176  ↑
+  Val Acc:    +0.0241  ↑
+  Train Loss: -0.0390  ↓ (better)
+  Val Loss:   -0.0876  ↓ (better)
+
+################################################################################
+##  EPOCH 12  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000250000  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 12
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8401  (84.01%)
+  Validation Accuracy:  0.7926  (79.26%)
+  Training Loss:        0.8466
+  Validation Loss:      1.5176
+  Learning Rate:        0.0000250000
+  Overfit Gap:          0.0475  (4.75%)  ✓ OK
+
+  CHANGE FROM EPOCH 11:
+  Train Acc:  +0.0097  ↑
+  Val Acc:    -0.0060  ↓
+  Train Loss: -0.0411  ↓ (better)
+  Val Loss:   +0.0046  ↑ (worse)
+
+################################################################################
+##  EPOCH 13  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000250000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 13
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8408  (84.08%)
+  Validation Accuracy:  0.7969  (79.69%)
+  Training Loss:        0.8303
+  Validation Loss:      1.4793
+  Learning Rate:        0.0000250000
+  Overfit Gap:          0.0439  (4.39%)  ✓ OK
+
+  CHANGE FROM EPOCH 12:
+  Train Acc:  +0.0006  ↑
+  Val Acc:    +0.0043  ↑
+  Train Loss: -0.0162  ↓ (better)
+  Val Loss:   -0.0383  ↓ (better)
+
+################################################################################
+##  EPOCH 14  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000250000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 14
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8472  (84.72%)
+  Validation Accuracy:  0.7978  (79.78%)
+  Training Loss:        0.8203
+  Validation Loss:      1.3990
+  Learning Rate:        0.0000250000
+  Overfit Gap:          0.0494  (4.94%)  ✓ OK
+
+  CHANGE FROM EPOCH 13:
+  Train Acc:  +0.0064  ↑
+  Val Acc:    +0.0009  ↑
+  Train Loss: -0.0100  ↓ (better)
+  Val Loss:   -0.0803  ↓ (better)
+
+################################################################################
+##  EPOCH 15  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000125000  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 15
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8547  (85.47%)
+  Validation Accuracy:  0.8072  (80.72%)
+  Training Loss:        0.8059
+  Validation Loss:      1.3965
+  Learning Rate:        0.0000125000
+  Overfit Gap:          0.0475  (4.75%)  ✓ OK
+
+  CHANGE FROM EPOCH 14:
+  Train Acc:  +0.0075  ↑
+  Val Acc:    +0.0095  ↑
+  Train Loss: -0.0145  ↓ (better)
+  Val Loss:   -0.0025  ↓ (better)
+
+################################################################################
+##  EPOCH 16  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000125000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 16
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8599  (85.99%)
+  Validation Accuracy:  0.8038  (80.38%)
+  Training Loss:        0.8022
+  Validation Loss:      1.4119
+  Learning Rate:        0.0000125000
+  Overfit Gap:          0.0561  (5.61%)  ✓ OK
+
+  CHANGE FROM EPOCH 15:
+  Train Acc:  +0.0052  ↑
+  Val Acc:    -0.0034  ↓
+  Train Loss: -0.0037  ↓ (better)
+  Val Loss:   +0.0154  ↑ (worse)
+
+################################################################################
+##  EPOCH 17  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000125000
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 17
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8682  (86.82%)
+  Validation Accuracy:  0.8029  (80.29%)
+  Training Loss:        0.7851
+  Validation Loss:      1.3836
+  Learning Rate:        0.0000125000
+  Overfit Gap:          0.0653  (6.53%)  ✓ OK
+
+  CHANGE FROM EPOCH 16:
+  Train Acc:  +0.0084  ↑
+  Val Acc:    -0.0009  ↓
+  Train Loss: -0.0171  ↓ (better)
+  Val Loss:   -0.0283  ↓ (better)
+
+################################################################################
+##  EPOCH 18  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000062500  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 18
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8695  (86.95%)
+  Validation Accuracy:  0.8021  (80.21%)
+  Training Loss:        0.7728
+  Validation Loss:      1.3597
+  Learning Rate:        0.0000062500
+  Overfit Gap:          0.0675  (6.75%)  ✓ OK
+
+  CHANGE FROM EPOCH 17:
+  Train Acc:  +0.0013  ↑
+  Val Acc:    -0.0009  ↓
+  Train Loss: -0.0124  ↓ (better)
+  Val Loss:   -0.0239  ↓ (better)
+
+################################################################################
+##  EPOCH 19  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000062500
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 19
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8657  (86.57%)
+  Validation Accuracy:  0.8098  (80.98%)
+  Training Loss:        0.7800
+  Validation Loss:      1.3847
+  Learning Rate:        0.0000062500
+  Overfit Gap:          0.0559  (5.59%)  ✓ OK
+
+  CHANGE FROM EPOCH 18:
+  Train Acc:  -0.0039  ↓
+  Val Acc:    +0.0077  ↑
+  Train Loss: +0.0073  ↑ (worse)
+  Val Loss:   +0.0250  ↑ (worse)
+
+################################################################################
+##  EPOCH 20  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000062500
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 20
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8755  (87.55%)
+  Validation Accuracy:  0.8090  (80.90%)
+  Training Loss:        0.7695
+  Validation Loss:      1.3412
+  Learning Rate:        0.0000062500
+  Overfit Gap:          0.0666  (6.66%)  ✓ OK
+
+  CHANGE FROM EPOCH 19:
+  Train Acc:  +0.0099  ↑
+  Val Acc:    -0.0009  ↓
+  Train Loss: -0.0106  ↓ (better)
+  Val Loss:   -0.0435  ↓ (better)
+
+################################################################################
+##  EPOCH 21  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000031250  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 21
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8682  (86.82%)
+  Validation Accuracy:  0.8046  (80.46%)
+  Training Loss:        0.7697
+  Validation Loss:      1.3495
+  Learning Rate:        0.0000031250
+  Overfit Gap:          0.0636  (6.36%)  ✓ OK
+
+  CHANGE FROM EPOCH 20:
+  Train Acc:  -0.0073  ↓
+  Val Acc:    -0.0043  ↓
+  Train Loss: +0.0003  ↑ (worse)
+  Val Loss:   +0.0083  ↑ (worse)
+
+################################################################################
+##  EPOCH 22  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000031250
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 22
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8732  (87.32%)
+  Validation Accuracy:  0.8081  (80.81%)
+  Training Loss:        0.7681
+  Validation Loss:      1.3512
+  Learning Rate:        0.0000031250
+  Overfit Gap:          0.0651  (6.51%)  ✓ OK
+
+  CHANGE FROM EPOCH 21:
+  Train Acc:  +0.0049  ↑
+  Val Acc:    +0.0034  ↑
+  Train Loss: -0.0016  ↓ (better)
+  Val Loss:   +0.0017  ↑ (worse)
+
+################################################################################
+##  EPOCH 23  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000031250
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 23
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8685  (86.85%)
+  Validation Accuracy:  0.8046  (80.46%)
+  Training Loss:        0.7774
+  Validation Loss:      1.3625
+  Learning Rate:        0.0000031250
+  Overfit Gap:          0.0638  (6.38%)  ✓ OK
+
+  CHANGE FROM EPOCH 22:
+  Train Acc:  -0.0047  ↓
+  Val Acc:    -0.0034  ↓
+  Train Loss: +0.0093  ↑ (worse)
+  Val Loss:   +0.0113  ↑ (worse)
+
+################################################################################
+##  EPOCH 24  
+################################################################################
+
+  PHASE: Phase 2 — Fine-Tuning (Top 20 Layers Unfrozen)
+  Strategy: Fine-tune top EfficientNet blocks to adapt pretrained features to rice disease patterns.
+  Optimizer: Adam | LR: 0.0000015625  <-- LR REDUCED
+  Loss Fn: CategoricalCrossentropy (label_smoothing=0.1)
+  Class Weights: Yes
+  Trainable Params: ~995,686 (head + top 20 EfficientNet layers)
+  Frozen Params: ~3,389,571
+
+  ======================================================================
+  ARCHITECTURE STATE AT EPOCH 24
+  ======================================================================
+  Input: 224 x 224 x 3 (RGB image, preprocessed by EfficientNet preprocess_input)
+  ──────────────────────────────────────────────────────────────────────
+
+  ┌─── EfficientNetB0 Backbone ──────────────────────────────────────────┐
+  │  [ FROZEN ] stem     → 112x112x32     | ~1,200       | Initial convolution: 3x3 Conv2D(32) + Ba
+  │  [ FROZEN ] block1   → 112x112x16     | ~2,000       | MBConv1 (k3x3, expand=1): Depthwise Conv
+  │  [ FROZEN ] block2   → 56x56x24       | ~10,000      | MBConv6 (k3x3, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block3   → 28x28x40       | ~15,000      | MBConv6 (k5x5, expand=6, stride=2): 2 su
+  │  [ FROZEN ] block4   → 14x14x80       | ~40,000      | MBConv6 (k3x3, expand=6, stride=2): 3 su
+  │  [ FROZEN ] block5   → 14x14x112      | ~75,000      | MBConv6 (k5x5, expand=6): 3 sub-blocks w
+  │  [TRAINING] block6   → 7x7x192        | ~150,000     | MBConv6 (k5x5, expand=6, stride=2): 4 su
+  │  [TRAINING] block7   → 7x7x320        | ~100,000     | MBConv6 (k3x3, expand=6): 1 sub-block, f
+  │  [TRAINING] top      → 7x7x1280       | ~410,000     | Final 1x1 Conv(1280) + BatchNorm + Swish
+  └─────────────────────────────────────────────────────────────────────┘
+
+  ┌─── Custom Classification Head ─────────────────────────────────────┐
+  │  [TRAINING] global_avg_pool → 1280       | 0                            | GlobalAveragePooling2D — collapses 
+  │  [TRAINING] batch_norm_1   → 1280       | ~5,120                       | BatchNormalization — stabilizes act
+  │  [TRAINING] dropout_1      → 1280       | 0                            | Dropout(0.4) — regularization, drop
+  │  [TRAINING] dense_256      → 256        | ~328,000 (1280*256 + 256 bias) | Dense(256, relu) — learned feature 
+  │  [TRAINING] batch_norm_2   → 256        | ~1,024                       | BatchNormalization — stabilizes den
+  │  [TRAINING] dropout_2      → 256        | 0                            | Dropout(0.2) — light regularization
+  │  [TRAINING] dense_output   → 6          | ~1,542 (256*6 + 6 bias)      | Dense(6, softmax) — final classific
+  └─────────────────────────────────────────────────────────────────────┘
+
+  Output: 6 classes [bacterial_leaf_blight, brown_spot, healthy,
+                      leaf_blast, narrow_brown_spot, panicle_blast]
+
+  ──────────────────────────────────────────────────────────────────────
+  METRICS
+  ──────────────────────────────────────────────────────────────────────
+  Training Accuracy:    0.8693  (86.93%)
+  Validation Accuracy:  0.8055  (80.55%)
+  Training Loss:        0.7709
+  Validation Loss:      1.3597
+  Learning Rate:        0.0000015625
+  Overfit Gap:          0.0638  (6.38%)  ✓ OK
+
+  CHANGE FROM EPOCH 23:
+  Train Acc:  +0.0009  ↑
+  Val Acc:    +0.0009  ↑
+  Train Loss: -0.0066  ↓ (better)
+  Val Loss:   -0.0028  ↓ (better)
+
+
+====================================================================================================
+  EPOCH-BY-EPOCH SUMMARY TABLE
+====================================================================================================
+  Ep   Phase    Train Acc   Val Acc     Train Loss   Val Loss     LR             Gap      Note
+  ──── ──────── ─────────── ─────────── ──────────── ──────────── ────────────── ──────── ────────────────────
+  1    P1       0.7101      0.7306      0.8769       1.0575       0.0010000000   -0.0206  ← BEST VAL ACC
+  2    P1       0.7931      0.7633      0.5917       1.1003       0.0010000000   0.0298   ← BEST VAL ACC
+  3    P1       0.8077      0.7719      0.5180       1.2010       0.0010000000   0.0358   ← BEST VAL ACC
+  4    P1       0.8328      0.7814      0.4622       1.2636       0.0010000000   0.0514   ← BEST VAL ACC
+  5    P1       0.8466      0.7952      0.4104       1.1250       0.0005000000   0.0514   ← BEST VAL ACC
+  6    P1       0.8547      0.7883      0.3881       1.1593       0.0005000000   0.0664   
+  7    P1       0.8532      0.7823      0.3970       1.1068       0.0005000000   0.0709   
+  8    P1       0.8635      0.7943      0.3666       1.1578       0.0002500000   0.0692   ← LR REDUCED
+  9    P2       0.7861      0.7745      1.0309       1.6376       0.0000500000   0.0115   ← PHASE SWITCH
+  10   P2       0.8129      0.7745      0.9267       1.6006       0.0000500000   0.0383   
+  11   P2       0.8305      0.7986      0.8877       1.5130       0.0000500000   0.0318   ← BEST VAL ACC
+  12   P2       0.8401      0.7926      0.8466       1.5176       0.0000250000   0.0475   ← LR REDUCED
+  13   P2       0.8408      0.7969      0.8303       1.4793       0.0000250000   0.0439   
+  14   P2       0.8472      0.7978      0.8203       1.3990       0.0000250000   0.0494   
+  15   P2       0.8547      0.8072      0.8059       1.3965       0.0000125000   0.0475   ← BEST VAL ACC
+  16   P2       0.8599      0.8038      0.8022       1.4119       0.0000125000   0.0561   
+  17   P2       0.8682      0.8029      0.7851       1.3836       0.0000125000   0.0653   
+  18   P2       0.8695      0.8021      0.7728       1.3597       0.0000062500   0.0675   ← LR REDUCED
+  19   P2       0.8657      0.8098      0.7800       1.3847       0.0000062500   0.0559   ← BEST VAL ACC
+  20   P2       0.8755      0.8090      0.7695       1.3412       0.0000062500   0.0666   
+  21   P2       0.8682      0.8046      0.7697       1.3495       0.0000031250   0.0636   ← LR REDUCED
+  22   P2       0.8732      0.8081      0.7681       1.3512       0.0000031250   0.0651   
+  23   P2       0.8685      0.8046      0.7774       1.3625       0.0000031250   0.0638   
+  24   P2       0.8693      0.8055      0.7709       1.3597       0.0000015625   0.0638   ← LR REDUCED
+
+  Best Validation Accuracy: 0.8098 at Epoch 19
+====================================================================================================
+
+
+================================================================================
+  TRAINING TIMELINE (ASCII Visualization)
+================================================================================
+
+  Val Accuracy Progress:
+  100%|────────────────────────────────────────────────────────────────────────|
+   90%| ·  ·  ·  ·  ·  ·  ·  ‖  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  ·  · |
+   80%| ·  ·  ·  ·  ·  ·  ·  ‖  ·  ·  ·  ·  ·  ·  █  █  █  █  █  █  █  █  █  █ |
+   70%| █  █  █  █  █  █  █  ‖  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █ |
+   60%| █  █  █  █  █  █  █  ‖  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █ |
+   50%| █  █  █  █  █  █  █  ‖  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █  █ |
+    0%|────────────────────────────────────────────────────────────────────────|
+         1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24  ← Epoch
+           Phase 1 (Frozen)                  Phase 2 (Fine-tune)               
+
+  Learning Rate Decay:
+  Ep 1 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ LR=0.00100000
+  Ep 2 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ LR=0.00100000
+  Ep 3 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ LR=0.00100000
+  Ep 4 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ LR=0.00100000
+  Ep 5 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░ LR=0.00050000
+  Ep 6 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░ LR=0.00050000
+  Ep 7 [P1] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░ LR=0.00050000
+  Ep 8 [P1] ▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00025000
+  Ep 9 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00005000
+  Ep10 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00005000
+  Ep11 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00005000
+  Ep12 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00002500
+  Ep13 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00002500
+  Ep14 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00002500
+  Ep15 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00001250
+  Ep16 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00001250
+  Ep17 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00001250
+  Ep18 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000625
+  Ep19 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000625
+  Ep20 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000625
+  Ep21 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000312
+  Ep22 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000312
+  Ep23 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000312
+  Ep24 [P2] ▓░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ LR=0.00000156
