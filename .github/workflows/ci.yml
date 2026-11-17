@@ -1,0 +1,92 @@
+name: Smart Agriculture AI - CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  test:
+    name: Lint + Unit Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      # Install only what the rule-based tests (non-TF) need, so CI stays fast.
+      # TF image model tests require GPU resources and would be done separately
+      # in a model-validation pipeline (see note below).
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            fastapi==0.115.0 \
+            uvicorn==0.30.6 \
+            pydantic==2.9.2 \
+            python-multipart==0.0.9 \
+            pandas==2.2.2 \
+            numpy==1.26.4 \
+            scikit-learn==1.5.1 \
+            joblib==1.4.2 \
+            requests==2.32.3 \
+            pytest==8.3.3 \
+            httpx==0.27.2
+
+      - name: Validate config files
+        run: |
+          python -c "
+          from utils.config_validator import validate_all_configs
+          validate_all_configs()
+          print('All config files valid.')
+          "
+
+      - name: Generate synthetic training dataset
+        run: |
+          python -c "
+          import numpy as np, pandas as pd
+          rng = np.random.default_rng(42)
+          profiles = {
+            'rice':  dict(N=(80,120),P=(35,55),K=(35,55),temperature=(22,32),humidity=(70,90),moisture=(55,80),ph=(5.0,6.5)),
+            'wheat': dict(N=(90,140),P=(45,70),K=(25,45),temperature=(12,25),humidity=(40,65),moisture=(35,55),ph=(6.0,7.5)),
+            'maize': dict(N=(110,160),P=(60,85),K=(45,70),temperature=(20,30),humidity=(50,75),moisture=(40,60),ph=(5.5,7.0)),
+          }
+          rows = []
+          for crop, ranges in profiles.items():
+              for _ in range(300):
+                  row = {k: round(rng.uniform(*v), 2) for k, v in ranges.items()}
+                  row['label'] = crop
+                  rows.append(row)
+          pd.DataFrame(rows).to_csv('datasets/sensor_data/crop_recommendation.csv', index=False)
+          print('Dataset generated.')
+          "
+
+      - name: Train crop recommendation model
+        run: python training/train_crop_model.py
+
+      - name: Run test suite
+        run: pytest tests/ -v --tb=short
+
+  lint:
+    name: Syntax check (py_compile)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Check all Python files compile
+        run: |
+          find . -name "*.py" \
+            -not -path "./.github/*" \
+            -not -path ".*/venv/*" \
+            -not -path ".*/node_modules/*" \
+            | xargs python -m py_compile
+          echo "All files syntax-checked OK."
