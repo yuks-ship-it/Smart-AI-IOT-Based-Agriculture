@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AgriMind – AI Companion Dashboard</title>
+  <meta name="description" content="AgriMind AI Companion: Smart agriculture dashboard providing real-time crop advisory, sensor telemetry, disease detection, irrigation & fertilizer guidance." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="/static/css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" defer></script>
+  <script src="/static/js/app.js" defer></script>
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- ═══════════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <!-- Brand -->
+    <div class="sidebar-brand">
+      <div class="brand-icon">🌿</div>
+      <div class="brand-text">
+        <div class="brand-name">AgriMind</div>
+        <div class="brand-sub">AI Companion</div>
+      </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+      <ul>
+        <li class="nav-item active" data-page="today" id="nav-today" role="button" tabindex="0" aria-label="Today">
+          <span class="nav-icon">🏠</span>
+          <span>Today</span>
+        </li>
+        <li class="nav-item" data-page="field" id="nav-field" role="button" tabindex="0" aria-label="Field overview">
+          <span class="nav-icon">🗺️</span>
+          <span>Field overview</span>
+        </li>
+        <li class="nav-item" data-page="sensors" id="nav-sensors" role="button" tabindex="0" aria-label="Sensors">
+          <span class="nav-icon">📡</span>
+          <span>Sensors</span>
+        </li>
+        <li class="nav-item" data-page="insights" id="nav-insights" role="button" tabindex="0" aria-label="Insights">
+          <span class="nav-icon">🔬</span>
+          <span>Insights</span>
+        </li>
+        <li class="nav-item" data-page="alerts" id="nav-alerts" role="button" tabindex="0" aria-label="Alerts">
+          <span class="nav-icon">🔔</span>
+          <span>Alerts</span>
+          <span class="nav-badge">3</span>
+        </li>
+        <li class="nav-item" data-page="assistant" id="nav-assistant" role="button" tabindex="0" aria-label="Assistant">
+          <span class="nav-icon">🤖</span>
+          <span>Assistant</span>
+        </li>
+        <li class="nav-item" data-page="reports" id="nav-reports" role="button" tabindex="0" aria-label="Reports">
+          <span class="nav-icon">📋</span>
+          <span>Reports</span>
+        </li>
+        <li class="nav-item" data-page="settings" id="nav-settings" role="button" tabindex="0" aria-label="Settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Weather -->
+    <div class="sidebar-weather">
+      <div class="weather-main">
+        <div class="weather-icon">☀️</div>
+        <div>
+          <div class="weather-temp">22°C</div>
+        </div>
+      </div>
+      <div class="weather-desc">Clear skies · Feels like 23°</div>
+    </div>
+
+    <!-- User Profile -->
+    <div class="sidebar-user" role="button" tabindex="0" aria-label="User profile">
+      <div class="user-avatar">🌱</div>
+      <div class="user-info">
+        <div class="user-name">Yukesh D.</div>
+        <div class="user-loc">Hetauda</div>
+      </div>
+      <div class="user-chevron">▾</div>
+    </div>
+  </aside>
+
+  <!-- ═══════════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════════ -->
+  <div class="main-content">
+
+    <!-- Top Header -->
+    <header class="top-header" role="banner">
+      <div class="header-greeting">
+        <h1 id="greeting-text">Good morning, Yukesh 🌱</h1>
+        <p>Here's how your fields are doing today.</p>
+      </div>
+      <div class="header-meta" role="complementary">
+        <div class="meta-chip">
+          <span class="dot"></span>
+          <span>5 devices online</span>
+        </div>
+        <div class="meta-chip">
+          📅 <span id="live-date">Tue, 9 Sep 2026</span>
+        </div>
+        <div class="meta-chip">
+          🕒 <span id="live-clock">6:10 AM</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scrollable Page Content -->
+    <main class="page-scroll" role="main">
+
+      <!-- ══════════════════════════════════════════
+           PAGE: TODAY
+      ═══════════════════════════════════════════ -->
+      <section class="page-section active" id="page-today" aria-label="Today's overview">
+
+        <!-- Morning Snapshot -->
+        <div class="morning-snapshot card">
+          <div class="snapshot-image">
+            <img src="/static/images/hero_field_banner.jpg" alt="Lush green agricultural fields at morning" />
+            <div class="snapshot-overlay">
+              <div class="snapshot-title">Morning snapshot</div>
+              <div class="snapshot-sub">AI assessment of your fields</div>
+            </div>
+          </div>
+          <div class="snapshot-metrics">
+            <div class="metric-item">
+              <div class="metric-icon">💧</div>
+              <div class="metric-label">Soil moisture</div>
+              <div class="metric-value"><span id="snap-moisture">58</span><span>%</span></div>
+              <div class="pill pill-green" style="margin-top:6px">Optimal</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-icon">🌿</div>
+              <div class="metric-label">Nitrogen level</div>
+              <div class="metric-value"><span id="snap-nitrogen">118</span><span> mg/kg</span></div>
+              <div class="pill pill-green" style="margin-top:6px">Good</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-icon">🐛</div>
+              <div class="metric-label">Pest pressure</div>
+              <div class="metric-value">6<span>/10</span></div>
+              <div class="pill pill-amber" style="margin-top:6px">Elevated</div>
+            </div>
+            <div class="metric-item">
+              <div class="metric-icon">🌧️</div>
+              <div class="metric-label">Rain outlook</div>
+              <div class="metric-value">25<span>%</span></div>
+              <div class="pill pill-blue" style="margin-top:6px">Low chance</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recommended For Today -->
+        <h2 class="section-title">Recommended for today</h2>
+        <div class="recommend-grid">
+
+          <!-- Pest Management -->
+          <div class="rec-card">
+            <div class="rec-card-icon icon-amber">🐛</div>
+            <h3>Pest management</h3>
+            <div class="pill pill-amber" style="margin-bottom:6px">Suggested</div>
+            <p>Pest pressure is high in <strong>Rice – Tiller stage.</strong></p>
+            <button class="btn btn-primary" onclick="openModal('pest')" id="btn-view-plan" aria-label="View pest management plan">View plan</button>
+          </div>
+
+          <!-- Irrigation -->
+          <div class="rec-card">
+            <div class="rec-card-icon icon-blue">💧</div>
+            <h3>Irrigation</h3>
+            <div class="pill pill-gray" style="margin-bottom:6px">Not needed</div>
+            <p>Soil moisture is good. No irrigation required.</p>
+            <button class="btn btn-outline" onclick="openModal('irrigation')" id="btn-see-details" aria-label="See irrigation details">See details</button>
+          </div>
+
+          <!-- Nutrition -->
+          <div class="rec-card">
+            <div class="rec-card-icon icon-green">🌿</div>
+            <h3>Nutrition</h3>
+            <div class="pill pill-green" style="margin-bottom:6px">In range</div>
+            <p>N, P, K levels are within suitable range.</p>
+            <button class="btn btn-outline" onclick="openModal('nutrition')" id="btn-view-nutrients" aria-label="View nutrient details">View nutrients</button>
+          </div>
+
+          <!-- AI Field Assistant -->
+          <div class="assistant-card">
+            <h3>AI field assistant</h3>
+            <p>Ask anything about your crops, pests, weather, or nutrients.</p>
+            <form class="assistant-input-row" id="mini-assistant-form" aria-label="Ask a question">
+              <input type="text" id="mini-assistant-input" placeholder="Type your question..." aria-label="Question input" />
+              <button type="submit" class="assistant-send-btn" aria-label="Send">➤</button>
+            </form>
+            <div class="quick-queries-label">Popular queries</div>
+            <div class="quick-queries">
+              <button class="quick-query-chip" id="qchip-1">Should I irrigate today?</button>
+              <button class="quick-query-chip" id="qchip-2">Best time to apply Urea?</button>
+              <button class="quick-query-chip" id="qchip-3">How to control leaf folder?</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Field Health + Highlights -->
+        <div class="bottom-row">
+          <div class="chart-card">
+            <div class="chart-header">
+              <div>
+                <div class="chart-title">Field health overview</div>
+                <div class="chart-sub">Live sensor trends • Last 7 days</div>
+              </div>
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#2B6CB0"></div>Soil moisture (%)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#DD6B20"></div>Soil temp (°C)</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#38A169"></div>Air humidity (%)</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrap">
+              <canvas id="field-health-chart" aria-label="Field health chart showing soil moisture, temperature, and air humidity over 7 days" role="img"></canvas>
+            </div>
+          </div>
+
+          <div class="highlights-card">
+            <h3>Field highlights</h3>
+            <div class="highlight-item">
+              <div class="highlight-check check-green">✓</div>
+              <div class="highlight-text">All sensors working normally</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-check check-green">✓</div>
+              <div class="highlight-text">No severe alerts</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-check check-blue">🕒</div>
+              <div class="highlight-text">Next scheduled report in 6 hours</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-check check-amber">⚡</div>
+              <div class="highlight-text">Firmware update available for 2 devices</div>
+            </div>
+            <div class="highlight-item">
+              <div class="highlight-check check-green">✓</div>
+              <div class="highlight-text">Weather data last synced 4 min ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Alerts Bar -->
+        <div class="alerts-bar" role="region" aria-label="Recent alerts">
+          <div class="alerts-bar-title">⚡ Recent alerts</div>
+          <div class="alerts-bar-items">
+            <div class="alert-chip" onclick="navigate('alerts')" id="alert-chip-1" role="button" tabindex="0">
+              <div class="alert-chip-icon icon-amber">🐛</div>
+              <div class="alert-chip-text">
+                <div class="alert-chip-msg">High pest risk detected in North block</div>
+                <div class="alert-chip-time">05:52 AM</div>
+              </div>
+            </div>
+            <div class="alert-chip" onclick="navigate('alerts')" id="alert-chip-2" role="button" tabindex="0">
+              <div class="alert-chip-icon icon-blue">💨</div>
+              <div class="alert-chip-text">
+                <div class="alert-chip-msg">Wind speed will rise after noon today</div>
+                <div class="alert-chip-time">05:20 AM</div>
+              </div>
+            </div>
+            <div class="alert-chip" onclick="navigate('alerts')" id="alert-chip-3" role="button" tabindex="0">
+              <div class="alert-chip-icon" style="background:#F2EBF9">📱</div>
+              <div class="alert-chip-text">
+                <div class="alert-chip-msg">Firmware update available for 2 devices</div>
+                <div class="alert-chip-time">04:30 AM</div>
+              </div>
+            </div>
+          </div>
+          <div class="view-all-link" id="view-all-alerts" role="button" tabindex="0" aria-label="View all alerts">View all alerts →</div>
+        </div>
+
+      </section><!-- /page-today -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: FIELD OVERVIEW
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-field" aria-label="Field overview">
+        <h2 class="section-title">Field blocks</h2>
+        <div class="field-grid">
+          <div class="field-block-card">
+            <div class="field-block-img">🌾</div>
+            <div class="field-block-info">
+              <div class="field-block-name">North Block</div>
+              <div class="field-block-crop">🌱 Rice — Tiller Stage</div>
+              <div class="field-block-stats">
+                <div class="field-stat">Moisture: <span>58%</span></div>
+                <div class="field-stat">Area: <span>2.4 ha</span></div>
+                <div class="field-stat">Pest: <span class="pill pill-amber" style="font-size:10px">Elevated</span></div>
+                <div class="field-stat">Health: <span class="pill pill-green" style="font-size:10px">Good</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="field-block-card">
+            <div class="field-block-img" style="background:linear-gradient(135deg,#744210,#C8A05A)">🌾</div>
+            <div class="field-block-info">
+              <div class="field-block-name">South Block</div>
+              <div class="field-block-crop">🌿 Wheat — Vegetative Stage</div>
+              <div class="field-block-stats">
+                <div class="field-stat">Moisture: <span>51%</span></div>
+                <div class="field-stat">Area: <span>1.8 ha</span></div>
+                <div class="field-stat">Pest: <span class="pill pill-green" style="font-size:10px">Low</span></div>
+                <div class="field-stat">Health: <span class="pill pill-amber" style="font-size:10px">Monitor</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="field-block-card">
+            <div class="field-block-img" style="background:linear-gradient(135deg,#276749,#48BB78)">🌽</div>
+            <div class="field-block-info">
+              <div class="field-block-name">East Block</div>
+              <div class="field-block-crop">🌽 Maize — Seedling Stage</div>
+              <div class="field-block-stats">
+                <div class="field-stat">Moisture: <span>64%</span></div>
+                <div class="field-stat">Area: <span>1.2 ha</span></div>
+                <div class="field-stat">Pest: <span class="pill pill-green" style="font-size:10px">None</span></div>
+                <div class="field-stat">Health: <span class="pill pill-green" style="font-size:10px">Optimal</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Crop Recommendation Tool -->
+        <div class="predictor-card">
+          <h3>🌾 Crop Recommendation</h3>
+          <p>Enter your soil and environment readings to get an AI-powered crop recommendation.</p>
+          <form id="crop-predict-form" aria-label="Crop recommendation form">
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="inp-n">Nitrogen (N) mg/kg</label>
+                <input type="number" id="inp-n" value="118" min="0" max="300" placeholder="e.g. 118" />
+              </div>
+              <div class="form-field">
+                <label for="inp-p">Phosphorus (P) mg/kg</label>
+                <input type="number" id="inp-p" value="42" min="0" max="300" placeholder="e.g. 42" />
+              </div>
+              <div class="form-field">
+                <label for="inp-k">Potassium (K) mg/kg</label>
+                <input type="number" id="inp-k" value="55" min="0" max="300" placeholder="e.g. 55" />
+              </div>
+              <div class="form-field">
+                <label for="inp-temp">Temperature (°C)</label>
+                <input type="number" id="inp-temp" value="22" min="-10" max="60" placeholder="e.g. 22" />
+              </div>
+              <div class="form-field">
+                <label for="inp-moist">Soil Moisture (%)</label>
+                <input type="number" id="inp-moist" value="58" min="0" max="100" placeholder="e.g. 58" />
+              </div>
+              <div class="form-field">
+                <label for="inp-hum">Humidity (%)</label>
+                <input type="number" id="inp-hum" value="71" min="0" max="100" placeholder="e.g. 71" />
+              </div>
+              <div class="form-field">
+                <label for="inp-ph">Soil pH</label>
+                <input type="number" id="inp-ph" value="6.4" min="0" max="14" step="0.1" placeholder="e.g. 6.4" />
+              </div>
+              <div class="form-field" style="display:flex;align-items:flex-end">
+                <button type="submit" class="btn btn-primary" id="btn-predict-crop" style="width:100%">🔍 Predict Crop</button>
+              </div>
+            </div>
+          </form>
+          <div class="loading-spinner" id="crop-loading"><div class="spinner"></div> Analyzing your field data...</div>
+          <div id="crop-error" style="color:#C53030;font-size:0.75rem;margin-bottom:8px"></div>
+          <div class="result-box" id="crop-result">
+            <div>
+              <div class="result-crop-name" id="crop-name">Rice</div>
+              <div class="result-confidence" id="crop-conf">Confidence: 91.4%</div>
+            </div>
+            <div class="result-top-3">
+              <div class="top3-label">Also suitable</div>
+              <div class="top3-items" id="crop-top3"></div>
+            </div>
+          </div>
+        </div>
+      </section><!-- /page-field -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: SENSORS
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-sensors" aria-label="Sensor telemetry">
+        <div class="sensor-header-row">
+          <h2 class="section-title" style="margin:0">Live Sensor Telemetry</h2>
+          <div class="live-badge"><div class="live-dot"></div> Live — updating every 2.5s</div>
+        </div>
+
+        <div class="sensors-grid">
+          <div class="sensor-card">
+            <div class="sensor-card-icon">💧</div>
+            <div class="sensor-card-label">Soil Moisture</div>
+            <div class="sensor-card-value"><span id="sv-moisture">58</span><span class="sensor-card-unit">%</span></div>
+            <div class="pill pill-green" style="margin-top:6px">Optimal</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-blue" id="sv-moisture-bar" style="width:58%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🌿</div>
+            <div class="sensor-card-label">Nitrogen (N)</div>
+            <div class="sensor-card-value"><span id="sv-nitrogen">118</span><span class="sensor-card-unit"> mg/kg</span></div>
+            <div class="pill pill-green" style="margin-top:6px">Good</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-green" id="sv-nitrogen-bar" style="width:59%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">⚗️</div>
+            <div class="sensor-card-label">Phosphorus (P)</div>
+            <div class="sensor-card-value"><span id="sv-phosphorus">42</span><span class="sensor-card-unit"> mg/kg</span></div>
+            <div class="pill pill-green" style="margin-top:6px">Good</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-amber" id="sv-phosphorus-bar" style="width:42%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🔬</div>
+            <div class="sensor-card-label">Potassium (K)</div>
+            <div class="sensor-card-value"><span id="sv-potassium">55</span><span class="sensor-card-unit"> mg/kg</span></div>
+            <div class="pill pill-green" style="margin-top:6px">Good</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-purple" id="sv-potassium-bar" style="width:55%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🌡️</div>
+            <div class="sensor-card-label">Temperature</div>
+            <div class="sensor-card-value"><span id="sv-temp">22.0</span><span class="sensor-card-unit">°C</span></div>
+            <div class="pill pill-green" style="margin-top:6px">Normal</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-amber" id="sv-temp-bar" style="width:44%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">💦</div>
+            <div class="sensor-card-label">Air Humidity</div>
+            <div class="sensor-card-value"><span id="sv-humidity">71</span><span class="sensor-card-unit">%</span></div>
+            <div class="pill pill-blue" style="margin-top:6px">Moderate</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-blue" id="sv-humidity-bar" style="width:71%"></div></div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🧪</div>
+            <div class="sensor-card-label">Soil pH</div>
+            <div class="sensor-card-value"><span id="sv-ph">6.4</span></div>
+            <div class="pill pill-green" style="margin-top:6px">In range</div>
+            <div class="sensor-bar"><div class="sensor-bar-fill fill-green" id="sv-ph-bar" style="width:46%"></div></div>
+          </div>
+        </div>
+
+        <!-- Device List -->
+        <div class="device-list">
+          <h3>📡 Connected Devices</h3>
+          <div class="device-row">
+            <div class="device-icon">📡</div>
+            <div>
+              <div class="device-name">Sensor Node A1</div>
+              <div class="device-sub">North Block · Last ping 12s ago</div>
+            </div>
+            <div class="pill pill-green">Online</div>
+            <div class="device-status-dot ds-online"></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon">📡</div>
+            <div>
+              <div class="device-name">Sensor Node B2</div>
+              <div class="device-sub">South Block · Last ping 18s ago</div>
+            </div>
+            <div class="pill pill-green">Online</div>
+            <div class="device-status-dot ds-online"></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon">📡</div>
+            <div>
+              <div class="device-name">Sensor Node C3</div>
+              <div class="device-sub">East Block · Last ping 31s ago</div>
+            </div>
+            <div class="pill pill-green">Online</div>
+            <div class="device-status-dot ds-online"></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon">📷</div>
+            <div>
+              <div class="device-name">Camera Node CAM-01</div>
+              <div class="device-sub">North Block · Firmware update available</div>
+            </div>
+            <div class="pill pill-amber">Update</div>
+            <div class="device-status-dot ds-warning"></div>
+          </div>
+          <div class="device-row">
+            <div class="device-icon">🌦️</div>
+            <div>
+              <div class="device-name">Weather Station WS-01</div>
+              <div class="device-sub">Field center · Last ping 8s ago</div>
+            </div>
+            <div class="pill pill-green">Online</div>
+            <div class="device-status-dot ds-online"></div>
+          </div>
+        </div>
+      </section><!-- /page-sensors -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: INSIGHTS (Vision Lab)
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-insights" aria-label="Insights and vision lab">
+        <h2 class="section-title">Vision Lab – AI Crop Analysis</h2>
+
+        <div class="insights-grid" style="margin-bottom:var(--gap-lg)">
+
+          <!-- Disease Detection -->
+          <div class="card" style="padding:20px">
+            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:4px">🦠 Disease Detection</h3>
+            <p style="font-size:var(--text-xs);color:#9DB5A3;margin-bottom:14px">Upload a crop leaf image to identify disease and get treatment advice.</p>
+            <select class="crop-select" style="width:100%;padding:8px 12px;background:#F5F7F4;border:1.5px solid rgba(0,0,0,0.08);border-radius:8px;font-size:var(--text-xs);color:#1A2B1E;margin-bottom:10px;outline:none" aria-label="Select crop for disease detection">
+              <option value="rice">Rice</option>
+              <option value="wheat">Wheat</option>
+              <option value="maize">Maize</option>
+            </select>
+            <label id="disease-dropzone" class="upload-zone" for="disease-file-input" role="button" tabindex="0" aria-label="Upload disease detection image">
+              <div class="upload-icon">🍃</div>
+              <h4>Drop leaf image here</h4>
+              <p>or click to browse (JPEG / PNG, max 8MB)</p>
+              <input type="file" id="disease-file-input" accept="image/jpeg,image/png" />
+            </label>
+            <div class="image-preview-wrap" id="disease-preview"><img src="" alt="Disease detection preview" /></div>
+            <div class="insight-result-box" id="disease-result"></div>
+          </div>
+
+          <!-- Growth Stage -->
+          <div class="card" style="padding:20px">
+            <h3 style="font-size:var(--text-base);font-weight:700;margin-bottom:4px">🌾 Growth Stage Detection</h3>
+            <p style="font-size:var(--text-xs);color:#9DB5A3;margin-bottom:14px">Upload a crop image to identify the current growth stage automatically.</p>
+            <select class="crop-select" style="width:100%;padding:8px 12px;background:#F5F7F4;border:1.5px solid rgba(0,0,0,0.08);border-radius:8px;font-size:var(--text-xs);color:#1A2B1E;margin-bottom:10px;outline:none" aria-label="Select crop for stage detection">
+              <option value="rice">Rice</option>
+              <option value="wheat">Wheat</option>
+              <option value="maize">Maize</option>
+            </select>
+            <label id="stage-dropzone" class="upload-zone" for="stage-file-input" role="button" tabindex="0" aria-label="Upload stage detection image">
+              <div class="upload-icon">🌱</div>
+              <h4>Drop crop image here</h4>
+              <p>or click to browse (JPEG / PNG, max 8MB)</p>
+              <input type="file" id="stage-file-input" accept="image/jpeg,image/png" />
+            </label>
+            <div class="image-preview-wrap" id="stage-preview"><img src="" alt="Stage detection preview" /></div>
+            <div class="insight-result-box" id="stage-result"></div>
+          </div>
+        </div>
+
+        <h2 class="section-title">Advisory Tools</h2>
+        <div class="advisor-row">
+
+          <!-- Fertilizer Advisor -->
+          <div class="advisor-card">
+            <h3>🌱 Fertilizer Advisor</h3>
+            <p>Get personalized NPK fertilizer recommendations from the AI engine.</p>
+            <form class="advisor-form" id="fertilizer-form" aria-label="Fertilizer advisor form">
+              <div class="form-field">
+                <label for="fert-crop">Crop</label>
+                <select id="fert-crop" style="width:100%;padding:8px 12px;background:#F5F7F4;border:1.5px solid rgba(0,0,0,0.08);border-radius:8px;font-size:var(--text-xs);color:#1A2B1E;outline:none" aria-label="Select crop for fertilizer recommendation">
+                  <option value="rice">Rice</option>
+                  <option value="wheat">Wheat</option>
+                  <option value="maize">Maize</option>
+                </select>
+              </div>
+              <div class="advisor-form form-row">
+                <div class="form-field">
+                  <label for="fert-n">N (mg/kg)</label>
+                  <input type="number" id="fert-n" value="118" min="0" max="300" />
+                </div>
+                <div class="form-field">
+                  <label for="fert-p">P (mg/kg)</label>
+                  <input type="number" id="fert-p" value="42" min="0" max="300" />
+                </div>
+              </div>
+              <div class="form-field">
+                <label for="fert-k">K (mg/kg)</label>
+                <input type="number" id="fert-k" value="55" min="0" max="300" />
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-get-fertilizer">Get Recommendations</button>
+            </form>
+            <div class="advisor-result" id="fert-result"></div>
+          </div>
+
+          <!-- Irrigation Advisor -->
+          <div class="advisor-card">
+            <h3>💧 Irrigation Advisor</h3>
+            <p>Check whether irrigation is needed for your crop and stage.</p>
+            <form class="advisor-form" id="irrigation-form" aria-label="Irrigation advisor form">
+              <div class="form-field">
+                <label for="irr-crop">Crop</label>
+                <select id="irr-crop" style="width:100%;padding:8px 12px;background:#F5F7F4;border:1.5px solid rgba(0,0,0,0.08);border-radius:8px;font-size:var(--text-xs);color:#1A2B1E;outline:none" aria-label="Select crop for irrigation recommendation">
+                  <option value="rice">Rice</option>
+                  <option value="wheat">Wheat</option>
+                  <option value="maize">Maize</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="irr-stage">Growth Stage</label>
+                <select id="irr-stage" style="width:100%;padding:8px 12px;background:#F5F7F4;border:1.5px solid rgba(0,0,0,0.08);border-radius:8px;font-size:var(--text-xs);color:#1A2B1E;outline:none" aria-label="Select growth stage">
+                  <option value="seedling">Seedling</option>
+                  <option value="tillering" selected>Tillering</option>
+                  <option value="vegetative">Vegetative</option>
+                  <option value="flowering">Flowering</option>
+                  <option value="maturity">Maturity</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label for="irr-moist">Soil Moisture (%)</label>
+                <input type="number" id="irr-moist" value="58" min="0" max="100" />
+              </div>
+              <button type="submit" class="btn btn-primary" id="btn-get-irrigation">Check Irrigation</button>
+            </form>
+            <div class="advisor-result" id="irr-result"></div>
+          </div>
+        </div>
+      </section><!-- /page-insights -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: ALERTS
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-alerts" aria-label="Alert management">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--gap)">
+          <h2 class="section-title" style="margin:0">🔔 Alerts &amp; Notifications</h2>
+          <div class="alerts-filter-row">
+            <button class="filter-chip active" data-filter="all" id="filter-all">All</button>
+            <button class="filter-chip" data-filter="pest" id="filter-pest">Pest</button>
+            <button class="filter-chip" data-filter="weather" id="filter-weather">Weather</button>
+            <button class="filter-chip" data-filter="device" id="filter-device">Device</button>
+          </div>
+        </div>
+
+        <div class="alert-list">
+          <div class="alert-full-item" data-type="pest" id="alert-item-1">
+            <div class="alert-full-icon icon-amber">🐛</div>
+            <div class="alert-full-msg">
+              <strong>High pest risk detected in North block</strong><br>
+              <span style="font-size:0.7rem;color:#9DB5A3">Leaf Folder activity detected. Scout field immediately.</span>
+            </div>
+            <div class="alert-full-time">05:52 AM</div>
+            <div class="pill pill-amber">High</div>
+            <button class="alert-ack-btn" id="ack-alert-1">Acknowledge</button>
+          </div>
+          <div class="alert-full-item" data-type="weather" id="alert-item-2">
+            <div class="alert-full-icon icon-blue">💨</div>
+            <div class="alert-full-msg">
+              <strong>Wind speed will rise after noon today</strong><br>
+              <span style="font-size:0.7rem;color:#9DB5A3">Expected 28–34 km/h. Avoid aerial spraying after 12:00 PM.</span>
+            </div>
+            <div class="alert-full-time">05:20 AM</div>
+            <div class="pill pill-blue">Weather</div>
+            <button class="alert-ack-btn" id="ack-alert-2">Acknowledge</button>
+          </div>
+          <div class="alert-full-item" data-type="device" id="alert-item-3">
+            <div class="alert-full-icon" style="background:#F2EBF9">📱</div>
+            <div class="alert-full-msg">
+              <strong>Firmware update available for 2 devices</strong><br>
+              <span style="font-size:0.7rem;color:#9DB5A3">Camera Node CAM-01 and Sensor B2. Schedule update during off-peak hours.</span>
+            </div>
+            <div class="alert-full-time">04:30 AM</div>
+            <div class="pill pill-purple">Device</div>
+            <button class="alert-ack-btn" id="ack-alert-3">Acknowledge</button>
+          </div>
+          <div class="alert-full-item" data-type="pest" id="alert-item-4">
+            <div class="alert-full-icon icon-amber">🐜</div>
+            <div class="alert-full-msg">
+              <strong>Brown Plant Hopper monitoring recommended – South Block</strong><br>
+              <span style="font-size:0.7rem;color:#9DB5A3">Warm humid conditions favorable for BPH. Install yellow sticky traps.</span>
+            </div>
+            <div class="alert-full-time">Yesterday 11:00 PM</div>
+            <div class="pill pill-amber">Monitor</div>
+            <button class="alert-ack-btn" id="ack-alert-4">Acknowledge</button>
+          </div>
+          <div class="alert-full-item" data-type="weather" id="alert-item-5">
+            <div class="alert-full-icon" style="background:#E7F3FE">🌧️</div>
+            <div class="alert-full-msg">
+              <strong>Light rain forecast for tomorrow morning</strong><br>
+              <span style="font-size:0.7rem;color:#9DB5A3">15–20mm expected between 4–7 AM. Good for seedling establishment.</span>
+            </div>
+            <div class="alert-full-time">Yesterday 08:00 PM</div>
+            <div class="pill pill-blue">Info</div>
+            <button class="alert-ack-btn" id="ack-alert-5">Acknowledge</button>
+          </div>
+        </div>
+      </section><!-- /page-alerts -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: ASSISTANT
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-assistant" aria-label="AI field assistant chat">
+        <h2 class="section-title">🤖 AI Field Assistant</h2>
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="chat-avatar">🌿</div>
+            <div>
+              <div class="chat-header-name">AgriMind AI</div>
+              <div class="chat-header-sub">Your smart agronomist – always available</div>
+            </div>
+            <div class="live-badge" style="margin-left:auto"><div class="live-dot"></div> Active</div>
+          </div>
+          <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="Chat conversation">
+            <div class="message ai">
+              <div class="msg-avatar ai">🌿</div>
+              <div class="msg-bubble">Hello Yukesh! 👋 I'm your AgriMind AI assistant. I have access to your live sensor data and field conditions.<br><br>Ask me about irrigation, fertilizers, pest control, disease treatment, weather advisories, or any crop-related question. How can I help you today?</div>
+            </div>
+          </div>
+          <form class="chat-input-row" id="chat-form" aria-label="Chat input">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ask about your crops, pests, irrigation, weather..." aria-label="Chat message input" />
+            <button type="submit" class="chat-send-btn" id="btn-chat-send" aria-label="Send message">➤</button>
+          </form>
+        </div>
+      </section><!-- /page-assistant -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: REPORTS
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-reports" aria-label="Reports and exports">
+        <h2 class="section-title">📋 Reports</h2>
+        <div class="report-summary-grid">
+          <div class="report-stat-card">
+            <div class="report-stat-icon">🌾</div>
+            <div class="report-stat-val">5.4 ha</div>
+            <div class="report-stat-label">Total cultivated area</div>
+          </div>
+          <div class="report-stat-card">
+            <div class="report-stat-icon">📊</div>
+            <div class="report-stat-val">27</div>
+            <div class="report-stat-label">Reports this month</div>
+          </div>
+          <div class="report-stat-card">
+            <div class="report-stat-icon">🐛</div>
+            <div class="report-stat-val">3</div>
+            <div class="report-stat-label">Pest events detected</div>
+          </div>
+          <div class="report-stat-card">
+            <div class="report-stat-icon">💧</div>
+            <div class="report-stat-val">142 mm</div>
+            <div class="report-stat-label">Irrigation applied this month</div>
+          </div>
+        </div>
+        <div class="report-history">
+          <h3 style="font-size:var(--text-base);font-weight:700;color:#1A2B1E;margin-bottom:14px">Report History</h3>
+          <div class="report-row">
+            <div class="report-icon">📄</div>
+            <div>
+              <div class="report-name">Daily Field Health Report</div>
+              <div style="font-size:var(--text-xs);color:#9DB5A3">Sensors, pest status, irrigation summary</div>
+            </div>
+            <div class="report-date">Today, 6:00 AM</div>
+            <button class="report-dl-btn" id="dl-report-1">↓ Download</button>
+          </div>
+          <div class="report-row">
+            <div class="report-icon">📊</div>
+            <div>
+              <div class="report-name">Weekly Advisory Summary</div>
+              <div style="font-size:var(--text-xs);color:#9DB5A3">AI recommendations and actions taken</div>
+            </div>
+            <div class="report-date">8 Sep 2026</div>
+            <button class="report-dl-btn" id="dl-report-2">↓ Download</button>
+          </div>
+          <div class="report-row">
+            <div class="report-icon">🌾</div>
+            <div>
+              <div class="report-name">Crop Recommendation Log</div>
+              <div style="font-size:var(--text-xs);color:#9DB5A3">All crop prediction requests and results</div>
+            </div>
+            <div class="report-date">7 Sep 2026</div>
+            <button class="report-dl-btn" id="dl-report-3">↓ Download</button>
+          </div>
+          <div class="report-row">
+            <div class="report-icon">🐛</div>
+            <div>
+              <div class="report-name">Pest Incident Report – North Block</div>
+              <div style="font-size:var(--text-xs);color:#9DB5A3">Leaf Folder detection and treatment log</div>
+            </div>
+            <div class="report-date">6 Sep 2026</div>
+            <button class="report-dl-btn" id="dl-report-4">↓ Download</button>
+          </div>
+          <div class="report-row">
+            <div class="report-icon">💧</div>
+            <div>
+              <div class="report-name">Monthly Irrigation Analysis</div>
+              <div style="font-size:var(--text-xs);color:#9DB5A3">Water usage, schedule compliance, savings</div>
+            </div>
+            <div class="report-date">1 Sep 2026</div>
+            <button class="report-dl-btn" id="dl-report-5">↓ Download</button>
+          </div>
+        </div>
+      </section><!-- /page-reports -->
+
+
+      <!-- ══════════════════════════════════════════
+           PAGE: SETTINGS
+      ═══════════════════════════════════════════ -->
+      <section class="page-section" id="page-settings" aria-label="Settings">
+        <h2 class="section-title">⚙️ Settings</h2>
+        <div class="settings-grid">
+
+          <div class="settings-section">
+            <h3>📡 Device Configuration</h3>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Sensor polling interval</div>
+                <div class="setting-value">Every 2.5 seconds</div>
+              </div>
+              <div class="pill pill-green" style="font-size:10px">Active</div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Auto-firmware updates</div>
+                <div class="setting-value">Scheduled at 2:00 AM</div>
+              </div>
+              <div class="toggle on" id="toggle-fw" role="switch" aria-checked="true" tabindex="0" aria-label="Auto-firmware updates"></div>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Offline data buffering</div>
+                <div class="setting-value">24-hour local cache</div>
+              </div>
+              <div class="toggle on" id="toggle-buf" role="switch" aria-checked="true" tabindex="0" aria-label="Offline data buffering"></div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>🔔 Alert Thresholds</h3>
+            <div class="setting-row">
+              <div class="setting-label">Soil moisture alert (low)</div>
+              <div class="setting-value">Below 50%</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Pest pressure alert</div>
+              <div class="setting-value">Above 5/10</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Temperature alert</div>
+              <div class="setting-value">Above 38°C</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Rain probability alert</div>
+              <div class="setting-value">Above 60%</div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>📍 Location & Farm</h3>
+            <div class="setting-row">
+              <div class="setting-label">Farm name</div>
+              <div class="setting-value">Yukesh Farm</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Location</div>
+              <div class="setting-value">Hetauda, Bagmati, Nepal</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Latitude / Longitude</div>
+              <div class="setting-value">27.71°N / 85.32°E</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-label">Timezone</div>
+              <div class="setting-value">Asia/Kathmandu (UTC+5:45)</div>
+            </div>
+          </div>
+
+          <div class="settings-section">
+            <h3>🔐 API & Integration</h3>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">API Key</div>
+                <div class="setting-value">••••••••••••••••</div>
+              </div>
+              <button class="btn btn-outline" style="font-size:10px;padding:4px 10px" id="btn-reveal-key">Reveal</button>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">Swagger API Docs</div>
+                <div class="setting-value">localhost:8000/docs</div>
+              </div>
+              <a href="/docs" target="_blank" class="btn btn-outline" style="font-size:10px;padding:4px 10px" id="link-api-docs">Open →</a>
+            </div>
+            <div class="setting-row">
+              <div>
+                <div class="setting-label">AI Advisory Notifications</div>
+                <div class="setting-value">Push + email</div>
+              </div>
+              <div class="toggle on" id="toggle-notif" role="switch" aria-checked="true" tabindex="0" aria-label="AI Advisory Notifications"></div>
+            </div>
+          </div>
+        </div>
+      </section><!-- /page-settings -->
+
+    </main><!-- /page-scroll -->
+  </div><!-- /main-content -->
+</div><!-- /app-shell -->
+
+<!-- ── Modal ──────────────────────────────────────────────────────── -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">Details</div>
+      <button class="modal-close" id="modal-close" aria-label="Close modal">✕</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- ── Toast ──────────────────────────────────────────────────────── -->
+<div class="toast" id="toast" role="alert" aria-live="assertive"></div>
+
+</body>
+</html>
